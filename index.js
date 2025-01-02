@@ -1,13 +1,6 @@
-// Mapeamento de cidades para bandeiras
-const cityFlags = {
-  "Los Angeles": "🇺🇸",
-  Paris: "🇫🇷",
-  London: "🇬🇧",
-  "New York": "🇺🇸",
-  Auckland: "🇳🇿",
-};
+let selectedCityTimeZone = null; // Variável global para rastrear a cidade selecionada
 
-// Função para atualizar o horário de cidades fixas
+// Função para atualizar o horário de cidades fixas e selecionadas
 function updateTime() {
   // Los Angeles
   let losAngelesElement = document.querySelector("#los-angeles");
@@ -20,12 +13,6 @@ function updateTime() {
     losAngelesTimeElement.innerHTML = losAngelesTime.format(
       "h:mm:ss [<small>]A[</small>]"
     );
-
-    // Adicionar bandeira a Los Angeles
-    let losAngelesFlag = cityFlags["Los Angeles"];
-    losAngelesElement.querySelector("h2").innerHTML = `
-      <span class="flag">${losAngelesFlag}</span> Los Angeles
-    `;
   }
 
   // Paris
@@ -39,40 +26,56 @@ function updateTime() {
     parisTimeElement.innerHTML = parisTime.format(
       "h:mm:ss [<small>]A[</small>]"
     );
+  }
 
-    // Adicionar bandeira a Paris
-    let parisFlag = cityFlags["Paris"];
-    parisElement.querySelector("h2").innerHTML = `
-      <span class="flag">${parisFlag}</span> Paris
-    `;
+  // Atualizar cidade selecionada pelo usuário
+  if (selectedCityTimeZone) {
+    let cityTime = moment().tz(selectedCityTimeZone);
+    let cityElement = document.querySelector("#selected-city");
+    if (cityElement) {
+      cityElement.querySelector(".date").innerHTML =
+        cityTime.format("MMMM Do YYYY");
+      cityElement.querySelector(".time").innerHTML = cityTime.format(
+        "h:mm:ss [<small>]A[</small>]"
+      );
+    }
   }
 }
 
-// Função para atualizar o horário baseado na seleção
+// Função para atualizar a cidade selecionada
 function updateCity(event) {
   let cityTimeZone = event.target.value;
   if (cityTimeZone === "current") {
     cityTimeZone = moment.tz.guess();
   }
+  selectedCityTimeZone = cityTimeZone; // Atualizar a cidade selecionada globalmente
+
   let cityName = cityTimeZone.replace("_", " ").split("/")[1];
-  let cityTime = moment().tz(cityTimeZone);
+  let cityFlag = cityFlags[cityName] || "🏳️"; // Bandeira padrão, se não encontrada
+
   let citiesElement = document.querySelector("#cities");
-
-  // Adiciona a bandeira dinâmica baseada no nome da cidade
-  let cityFlag = cityFlags[cityName] || "🏳️"; // Default flag if not found
-
   citiesElement.innerHTML = `
-    <div class="city">
+    <div class="city" id="selected-city">
       <div>
         <h2><span class="flag">${cityFlag}</span> ${cityName}</h2>
-        <div class="date">${cityTime.format("MMMM Do YYYY")}</div>
+        <div class="date"></div>
       </div>
-      <div class="time">${cityTime.format("h:mm:ss")} <small>${cityTime.format(
-    "A"
-  )}</small></div>
+      <div class="time"></div>
     </div>
   `;
+
+  // Atualizar o horário imediatamente para a nova cidade
+  updateTime();
 }
+
+// Dicionário de bandeiras para cidades/países
+const cityFlags = {
+  "Los Angeles": "🇺🇸",
+  Paris: "🇫🇷",
+  London: "🇬🇧",
+  Auckland: "🇳🇿",
+  "New York": "🇺🇸",
+};
 
 // Atualizar o tempo inicial e configurar o intervalo
 updateTime();
