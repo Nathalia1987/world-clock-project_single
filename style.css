@@ -63,3 +63,10 @@ footer {
   font-size: 18px;
   color: rgba(0, 0, 0, 0.8);
 }
+
+.flag {
+  margin-right: 8px;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
